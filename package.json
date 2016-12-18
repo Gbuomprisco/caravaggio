@@ -1,5 +1,6 @@
 {
   "name": "caravaggio-protractor",
+  "description": "Caravaggio is a dead simple visual regression testing plugin for taking and comparing screenshots with Protractor",
   "version": "0.0.1",
   "dependencies": {},
   "devDependencies": {
@@ -10,6 +11,14 @@
     "tslint": "^4.1.1",
     "typescript": "^2.1.4"
   },
+  "author": {
+    "name": "Giancarlo Buomprisco",
+    "email": "giancarlo@buompris.co"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gbuomprisco/caravaggio"
+  },
   "scripts": {
     "build": "tsc",
     "postinstall": "npm run build",
@@ -18,5 +27,9 @@
   "main": "./dist/caravaggio-protractor.js",
   "files": [
     "dist"
-  ]
+  ],
+  "bugs": {
+    "email": "giancarlo@buompris.co",
+    "url": "https://github.com/gbuomprisco/caravaggio/issues"
+  }
 }
