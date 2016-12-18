@@ -22,7 +22,7 @@ export default class Caravaggio {
      *
      * @memberOf Caravaggio
      */
-    public setOptions(options: Options) {
+    public setOptions(options: Options): void {
         this.options = Object.assign({}, defaults, options);
 
         // generate folders based on the option passed
@@ -36,7 +36,7 @@ export default class Caravaggio {
      * @memberOf Caravaggio
      */
     public getResults(): Result[] {
-        return this.results;
+        return this.results.slice(0);
     }
 
     /**
@@ -56,7 +56,7 @@ export default class Caravaggio {
         }
 
         this.createImage(fileName, screenshot, 'actual');
-        this.runComparison(fileName);
+        return this.runComparison(fileName);
     }
 
     /**
@@ -82,10 +82,8 @@ export default class Caravaggio {
         const pixelDiff = new PixelDiff({
             imageAPath: standard,
             imageBPath: actual,
-
             thresholdType: PixelDiff.THRESHOLD_PERCENT,
             threshold,
-
             imageOutputPath: this.getImageUrl(fileName, 'diff')
         });
 
@@ -103,7 +101,7 @@ export default class Caravaggio {
      *
      * @private
      * @param {string} fileName
-     * @param {('actual' | 'target' | 'diff')} type
+     * @param {Type} type
      * @returns {string}
      *
      * @memberOf Caravaggio
@@ -119,18 +117,16 @@ export default class Caravaggio {
      *
      * @memberOf Caravaggio
      */
-    private createFolders() {
+    private createFolders(): void {
         const folders = [
             `${this.options.screenshotsPath}/standard`,
             `${this.options.screenshotsPath}/actual`,
             `${this.options.screenshotsPath}/diff`
         ];
 
-        folders.forEach(folder => {
-            if (!existsSync(folder)) {
-                mkdirSync(folder);
-            }
-        });
+        folders
+            .filter(folder => existsSync(folder) === false)
+            .forEach(folder => mkdirSync(folder));
     }
 
     /**
@@ -157,7 +153,7 @@ export default class Caravaggio {
      *
      * @memberOf Caravaggio
      */
-    private addResult(result: Result) {
+    private addResult(result: Result): void {
         this.results = [...this.results, result];
     }
 }

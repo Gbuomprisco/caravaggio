@@ -27,22 +27,26 @@ export function postTest(passed, testInfo) {
         return;
     }
 
-    console.info(`${testInfo.category}:${testInfo.name}`);
+    console.info(`${testInfo.category}: ${testInfo.name}`);
 
-    results.forEach(result => {
-        if (result.hasPassed) {
-            this.addSuccess(result.name, {differences: result.differences});
-        } else {
-            console.info(
-                `${result.name} has differences with its standard image.
-                If you believe the current state of ${name} to be the best, delete the image in the "standard" folder
-                and rerun the tests`
-            );
-
-            this.addFailure(result.name, {differences: result.differences});
-        }
-    });
+    results.forEach(reportToProtractor.bind(this));
 };
+
+function reportToProtractor(result) {
+    if (result.hasPassed) {
+        this.addSuccess(result.name, {differences: result.differences});
+        return;
+    } 
+
+    console.info(
+        `${result.name} has differences with its standard image.
+        If you believe the current state of ${name} to be the best, 
+        delete the image in the "standard" folder and rerun the tests`
+    );
+
+    this.addFailure(result.name, {differences: result.differences});
+}
+
 
 /**
  * - clean up results
