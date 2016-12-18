@@ -1,0 +1,17 @@
+{
+  "name": "caravaggio-protractor",
+  "version": "0.0.1",
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "^6.0.52",
+    "@types/protractor": "^4.0.0",
+    "pixel-diff": "^1.0.1",
+    "protractor": "^4.0.13",
+    "tslint": "^4.1.1",
+    "typescript": "^2.1.4"
+  },
+  "scripts": {
+    "build": "tsc"
+  },
+  "main": "./dist/caravaggio-protractor.js"
+}
