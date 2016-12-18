@@ -7,7 +7,7 @@ The comparison between screenshots is based on the library [PixelDiff](https://g
 
 ## Install
         
-        npm install caravaggio
+        npm install caravaggio-protractor
 
 ## Usage
 

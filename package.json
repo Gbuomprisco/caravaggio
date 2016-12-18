@@ -11,7 +11,12 @@
     "typescript": "^2.1.4"
   },
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "postinstall": "npm run build",
+    "prepublish": "npm run build"
   },
-  "main": "./dist/caravaggio-protractor.js"
+  "main": "./dist/caravaggio-protractor.js",
+  "files": [
+    "dist"
+  ]
 }
