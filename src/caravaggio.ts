@@ -23,7 +23,7 @@ export default class Caravaggio {
      * @memberOf Caravaggio
      */
     public setOptions(options: Options): void {
-        this.options = Object.assign({}, defaults, options);
+        this.options = {...defaults, ...options};
 
         // generate folders based on the option passed
         this.createFolders();
