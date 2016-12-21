@@ -16,10 +16,10 @@ Caravaggio is a dead simple visual regression testing plugin for taking and comp
 // protractor.conf
 
 // if you use typescript
-import Caravaggio from 'caravaggio';
+import Caravaggio from 'caravaggio-protractor';
 
 /* or if you use node */
-const Caravaggio = require('caravaggio').default;
+const Caravaggio = require('caravaggio-protractor').default;
 
 exports.config = {
     // add caravaggio to the plugins array and define its options

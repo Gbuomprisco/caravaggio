@@ -1,12 +1,13 @@
 {
   "name": "caravaggio-protractor",
   "description": "Caravaggio is a dead simple visual regression testing plugin for taking and comparing screenshots with Protractor",
-  "version": "0.0.2",
-  "dependencies": {},
+  "version": "0.0.3",
+  "dependencies": {
+    "pixel-diff": "^1.0.1"
+  },
   "devDependencies": {
     "@types/node": "^6.0.52",
     "@types/protractor": "^4.0.0",
-    "pixel-diff": "^1.0.1",
     "protractor": "^4.0.13",
     "tslint": "^4.1.1",
     "typescript": "^2.1.4"
