@@ -24,7 +24,7 @@ const Caravaggio = require('caravaggio-protractor').default;
 exports.config = {
     // add caravaggio to the plugins array and define its options
     plugins: [{
-        package: 'caravaggio',
+        package: 'caravaggio-protractor',
         screenshotsPath: '/path/to/my/screenshots', // please create the 'screenshots' folder if missing
         threshold: 0 // this is by default, no need to define it
     }],

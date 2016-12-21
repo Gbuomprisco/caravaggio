@@ -6,6 +6,7 @@ const PixelDiff = require('pixel-diff');
 const defaults: Options = {
     screenshotsPath: './screenshots',
     threshold: 0,
+    debug: false,
     // resolutions: [320, 768, 1024, 1366, 1440, 1920]
 };
 
@@ -88,12 +89,13 @@ export default class Caravaggio {
         });
 
         const diff = await pixelDiff.runWithPromise();
-
-        this.addResult({
+        const result = {
             hasPassed: pixelDiff.hasPassed(diff.code),
             differences: diff.differences,
             name: fileName
-        });
+        };
+
+        this.addResult(result);
     }
 
     /**
@@ -154,6 +156,10 @@ export default class Caravaggio {
      * @memberOf Caravaggio
      */
     private addResult(result: Result): void {
+        if (this.options.debug) {
+            console.log(result);
+        }
+
         this.results = [...this.results, result];
     }
 }
