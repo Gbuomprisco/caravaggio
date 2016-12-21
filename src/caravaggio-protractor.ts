@@ -30,6 +30,7 @@ export function postTest(passed, testInfo) {
     console.info(`${testInfo.category}: ${testInfo.name}`);
 
     results.forEach(reportToProtractor.bind(this));
+    caravaggio.clear();
 };
 
 function reportToProtractor(result) {
@@ -45,18 +46,6 @@ function reportToProtractor(result) {
     );
 
     this.addFailure(result.name, {differences: result.differences});
-}
-
-
-/**
- * - clean up results
- * @name teardown
- * 
- * @export
- */
-export function teardown() {
-    const caravaggio = browser.params.caravaggio;
-    caravaggio.clear();
 }
 
 export const name = 'Caravaggio';
