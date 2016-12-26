@@ -13,7 +13,7 @@ export interface Options {
     imageComparisonFn: (fileName: string, tolerance: number) => Promise<Result>;
 }
 
-export type Type = "actual" | "standard" | "diff";
+export type Type = 'actual' | 'standard' | 'diff';
 
 export interface Result {
     hasPassed: boolean;
