@@ -1,19 +1,17 @@
-import * as console from 'console';
 import { createWriteStream, existsSync, mkdirSync } from 'fs';
-import { protractor } from 'protractor';
-
-const PixelDiff = require('pixel-diff');
-const defaults: Options = {
-    screenshotsPath: './screenshots',
-    threshold: 0,
-    debug: false,
-    // resolutions: [320, 768, 1024, 1366, 1440, 1920]
-};
-
 import { Options, Type, Result } from './types';
+import { defaults, takeScreenshot } from './helpers';
+import * as console from 'console';
 
-export default class Caravaggio {
+export class Caravaggio {
+    /**
+     * @name results
+     */
     private results: Result[] = [];
+
+    /**
+     * @name options
+     */
     private options: Options;
 
     /**
@@ -37,27 +35,36 @@ export default class Caravaggio {
      * @memberOf Caravaggio
      */
     public getResults(): Result[] {
-        return this.results.slice(0);
+        return [...this.results];
     }
 
     /**
      *
      * @name capture
      * @param {string} fileName
+     * @param {string} selector
      *
      * @memberOf Caravaggio
      */
-    public async capture(fileName: string) {
-        const screenshot = await protractor.browser.takeScreenshot();
+    public async capture(fileName: string, selector?: string) {
+        const screenshot = await takeScreenshot(selector);
         const standard = this.getImageUrl(fileName, 'standard');
 
+        // if the standard image does not exit - create the baseline
         if (existsSync(standard) === false) {
             console.info(`${fileName} does not exist. It will be generated as standard image.`);
+            
             this.createImage(fileName, screenshot, 'standard');
+
+            // callback
+            this.options.onNewImage(fileName);
         }
 
+        // create the image from the screenshot
         this.createImage(fileName, screenshot, 'actual');
-        return this.runComparison(fileName);
+
+        // run comparison between images
+        this.runComparison(fileName);
     }
 
     /**
@@ -76,24 +83,8 @@ export default class Caravaggio {
      * @memberOf Caravaggio
      */
     private async runComparison(fileName: string): Promise<any> {
-        const standard = this.getImageUrl(fileName, 'standard');
-        const actual = this.getImageUrl(fileName, 'actual');
-        const threshold = this.options.threshold === 0 ? 0 : this.options.threshold / 100;
-
-        const pixelDiff = new PixelDiff({
-            imageAPath: standard,
-            imageBPath: actual,
-            thresholdType: PixelDiff.THRESHOLD_PERCENT,
-            threshold,
-            imageOutputPath: this.getImageUrl(fileName, 'diff')
-        });
-
-        const diff = await pixelDiff.runWithPromise();
-        const result = {
-            hasPassed: pixelDiff.hasPassed(diff.code),
-            differences: diff.differences,
-            name: fileName
-        };
+        const tolerance = this.options.tolerance;
+        const result = await this.options.imageComparisonFn(fileName, tolerance);
 
         this.addResult(result);
     }
@@ -142,7 +133,7 @@ export default class Caravaggio {
      * @memberOf Caravaggio
      */
     private createImage(fileName: string, data: any, type: Type): void {
-        var actual = createWriteStream(this.getImageUrl(fileName, type), {flags: 'w'});
+        const actual = createWriteStream(this.getImageUrl(fileName, type), {flags: 'w'});
         actual.write(new Buffer(data, 'base64'));
         actual.end();
     }
