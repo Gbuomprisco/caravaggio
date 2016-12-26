@@ -48,29 +48,34 @@ it('does something I expect in page "about"', () => {
     caravaggio.capture('about');
 
     clickOnButton().then(() => {
+        // target full page
         caravaggio.capture('about-button-clicked');
+        
+        // target a specific selector
+        caravaggio.capture('about-button-clicked--header', '.header');
     });
 });
 
 ```
-Every time a screenshot is taken for the first time, Caravaggio assumes it as baseline for the tests.
+Every time a screenshot is taken for the first time, Caravaggio adds it as a baseline image.
 
 If you think that a change in your application needs to be the new standard instead, just delete the file in the folder `screenshotsPath/standard`.    
 
 Caravaggio fully integrates with Protractor: failures will be added to the reports at the end of the tests, and so will successful tests.
 
 ## API
+Plugin configuration
 
 ```javascript
 {
-    package: 'caravaggio-protractor', // name of the package (mandatory)
+    package: 'caravaggio-protractor',        // name of the package (mandatory)
     screenshotsPath: '/path/to/screenshots', // path to screenshots folder (default './screenshots')
-    tolerance: 0, // mismatch tolerance expressed in percentage (default 0)
+    tolerance: 0,                            // mismatch tolerance expressed in percentage (default 0)
 
-    onFailure: noop, // callback when a test fails
-    onSuccess: noop, // callback when a test passes
-    onComplete: noop, // callback all tests complete
-    onNewImage: noop, // callback when a baseline image is created
+    onFailure: (Result) => any,              // callback when a test fails
+    onSuccess: (Result) => any,          // callback when a test passes
+    onComplete: () => any,                   // callback all tests complete
+    onNewImage: (fileName: string) => any,   // callback when a baseline image is created
 
     // image comparison function, you can overwrite it and use your own (or using a different library)
     // as long as it returns a Result (see interface below)

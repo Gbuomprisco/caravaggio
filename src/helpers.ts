@@ -13,7 +13,7 @@ export const defaults: Options = {
     onFailure: noop,
     onSuccess: noop,
     onComplete: noop,
-    onNewImage: noop,
+    onNewImage: noop
     // resolutions: [320, 768, 1024, 1366, 1440, 1920],
 
     imageComparisonFn
