@@ -52,26 +52,25 @@ export class Caravaggio {
             return;
         }
 
-        takeScreenshot(selector).then(screenshot => {
-            const standard = this.getImageUrl(fileName, 'standard');
+        const standard = this.getImageUrl(fileName, 'standard');
+        const standardExists = existsSync(standard) === false;
 
-            // if the standard image does not exit - create the baseline
-            if (existsSync(standard) === false) {
-                log(`${fileName} does not exist. It will be generated as standard image.`);
+        // if the standard image does not exit - create the baseline
+        if (standardExists) {
+            log(`${fileName} does not exist. It will be generated as standard image.`);
 
-                // create the baseline image
-                this.createImage(fileName, screenshot, 'standard');
+            // create the baseline image
+            this.createImage(fileName, 'standard', selector);
 
-                // callback
-                this.options.onNewImage(fileName);
-            }
-
+            // callback
+            this.options.onNewImage(fileName);
+        } else {
             // create the image from the screenshot
-            this.createImage(fileName, screenshot, 'actual');
+            this.createImage(fileName, 'actual', selector);
 
             // run comparison between images
             this.runComparison(fileName);
-        });
+        }
     }
 
     /**
@@ -144,14 +143,18 @@ export class Caravaggio {
      *
      * @private
      * @param {string} fileName
-     * @param {any} data
      * @param {Type} type
+     * @param {string} selector
      *
      * @memberOf Caravaggio
      */
-    private createImage(fileName: string, data: string, type: Type): void {
-        const actual = createWriteStream(this.getImageUrl(fileName, type), {flags: 'w'});
-        actual.write(new Buffer(data, 'base64'));
-        actual.end();
+    private createImage(fileName: string, type: Type, selector?: string): void {
+        const url = this.getImageUrl(fileName, type);
+
+        return takeScreenshot(selector).then(data => {
+            const actual = createWriteStream(url, {flags: 'w'});
+            actual.write(new Buffer(data, 'base64'));
+            actual.end();
+        });
     }
 }
