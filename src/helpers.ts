@@ -10,6 +10,7 @@ export const defaults: Options = {
     screenshotsPath: './screenshots',
     tolerance: 0,
     debug: false,
+    isEnabled: true,
 
     // callbacks
     onFailure: noop,

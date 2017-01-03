@@ -2,6 +2,7 @@ export interface Options {
     screenshotsPath: string;
     tolerance: number;
     debug: boolean;
+    isEnabled: boolean;
 
     // resolutions?: number[]
 

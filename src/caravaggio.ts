@@ -1,7 +1,6 @@
 import { createWriteStream, existsSync, mkdirSync } from 'fs';
 import { Options, Type, Result } from './types';
 import { defaults, takeScreenshot, log, getFolders } from './helpers';
-import * as console from 'console';
 
 export class Caravaggio {
     /**
@@ -24,8 +23,10 @@ export class Caravaggio {
     public setOptions(options: Options): void {
         this.options = {...defaults, ...options};
 
-        // generate folders based on the option passed
-        this.createFolders(this.options.screenshotsPath);
+        if (this.options.isEnabled) {
+            // generate folders based on the option passed
+            this.createFolders(this.options.screenshotsPath);
+        }
     }
 
     /**
@@ -47,6 +48,10 @@ export class Caravaggio {
      * @memberOf Caravaggio
      */
     public capture(fileName: string, selector?: string) {
+        if (this.options.isEnabled === false) {
+            return;
+        }
+
         takeScreenshot(selector).then(screenshot => {
             const standard = this.getImageUrl(fileName, 'standard');
 
