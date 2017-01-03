@@ -53,10 +53,9 @@ export class Caravaggio {
         }
 
         const standard = this.getImageUrl(fileName, 'standard');
-        const standardExists = existsSync(standard) === false;
 
         // if the standard image does not exit - create the baseline
-        if (standardExists) {
+        if (existsSync(standard) === false) {
             log(`${fileName} does not exist. It will be generated as standard image.`);
 
             // create the baseline image
@@ -66,10 +65,10 @@ export class Caravaggio {
             this.options.onNewImage(fileName);
         } else {
             // create the image from the screenshot
-            this.createImage(fileName, 'actual', selector);
-
-            // run comparison between images
-            this.runComparison(fileName);
+            this.createImage(fileName, 'actual', selector).then(() => {
+                // run comparison between images
+                this.runComparison(fileName);
+            });
         }
     }
 
@@ -78,8 +77,16 @@ export class Caravaggio {
      *
      * @memberOf Caravaggio
      */
-    public clear(): void {
+    public clearAll(): void {
         this.results = [];
+    }
+
+    /**
+     * @name clearResult
+     * @param result
+     */
+    public clearResult(result: Result) {
+        this.results = this.results.filter(_result => _result !== result);
     }
 
     /**
@@ -88,15 +95,22 @@ export class Caravaggio {
      *
      * @memberOf Caravaggio
      */
-    private async runComparison(fileName: string): Promise<any> {
-        const tolerance = this.options.tolerance;
-        const result = await this.options.imageComparisonFn(fileName, tolerance);
+    private runComparison(fileName: string) {
+        const options = {
+            tolerance: this.options.tolerance,
+            fileName,
+            standardPath: this.getImageUrl(fileName, 'standard'),
+            actualPath: this.getImageUrl(fileName, 'actual'),
+            diffPath: this.getImageUrl(fileName, 'diff')
+        };
 
-        if (this.options.debug) {
-            log(JSON.stringify(result));
-        }
+        this.options.imageComparisonFn(options).then((result: Result) => {
+            if (this.options.debug) {
+                log(JSON.stringify(result));
+            }
 
-        this.addResult(result);
+            this.addResult(result);
+        });
     }
 
     /**
@@ -148,7 +162,7 @@ export class Caravaggio {
      *
      * @memberOf Caravaggio
      */
-    private createImage(fileName: string, type: Type, selector?: string): void {
+    private createImage(fileName: string, type: Type, selector?: string) {
         const url = this.getImageUrl(fileName, type);
 
         return takeScreenshot(selector).then(data => {

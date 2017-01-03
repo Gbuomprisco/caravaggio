@@ -11,7 +11,7 @@ export interface Options {
     onComplete: (...args) => any;
     onNewImage: (...args) => any;
 
-    imageComparisonFn: (fileName: string, tolerance: number) => Promise<Result>;
+    imageComparisonFn: (ImageComparisonOptions) => Promise<Result>;
 }
 
 export type Type = 'actual' | 'standard' | 'diff';
@@ -20,4 +20,12 @@ export interface Result {
     hasPassed: boolean;
     differences: number;
     name: string;
+}
+
+export interface ImageComparisonOptions {
+    fileName: string;
+    tolerance: number;
+    standardPath: string;
+    diffPath: string;
+    actualPath: string;
 }

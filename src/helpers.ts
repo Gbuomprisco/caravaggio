@@ -1,9 +1,9 @@
 import { browser } from 'protractor/built';
-import { protractor, element, by, $ } from 'protractor';
+import { protractor, $ } from 'protractor';
 import { Options } from './types';
 import { imageComparisonFn } from './pixel-diff';
 
-const sharp = require('sharp');
+const lwip = require('lwip');
 const noop = (...args) => {};
 
 export const defaults: Options = {
@@ -48,20 +48,12 @@ export function takeScreenshot(selector: string) {
     const size = el.getSize();
     const location = el.getLocation();
     const deferred = protractor.promise.defer();
-    const OFFSET = 20;
 
     protractor.promise.all([location, size, screenshot]).then(data => {
-        sharp(new Buffer(data[2], 'base64'))
-            .extract({
-                width: data[1].width + (OFFSET * 2),
-                height: data[1].height + (OFFSET * 2),
-                left: data[0].x - OFFSET,
-                top: data[0].y - OFFSET
-            })
-            .toBuffer()
-            .then(image => {
-                deferred.fulfill(Buffer.from(image, 'base64'));
-            });
+        cropImage(data, (buffer) => {
+            const image = Buffer.from(buffer, 'base64');
+            deferred.fulfill(image);
+        });
     });
 
     return deferred.promise;
@@ -79,4 +71,23 @@ export function getSize() {
  */
 export function log(text: string, color: string = '\x1b[34m'): void {
     console.log(color, text, '\x1b[0m');
+}
+
+export function cropImage(data: any[], callback) {
+    const buffer = new Buffer(data[2], 'base64');
+
+    const OFFSET = 30;
+    const extent = (n: number): number => n + (OFFSET * 2);
+    const position = (n: number): number => n - OFFSET >= 0 ? n - OFFSET : n;
+
+    const left = position(data[0].x);
+    const top = position(data[0].y);
+    const width = extent(left + data[1].width);
+    const height = extent(top + data[1].height);
+
+    return lwip.open(buffer, 'png', (err, image) => {
+        image.batch()
+            .crop(left, top, width, height)
+            .toBuffer('png', (error, bufferedImage) => callback(bufferedImage));
+    });
 }

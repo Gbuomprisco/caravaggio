@@ -1,28 +1,28 @@
 const PixelDiff = require('pixel-diff');
-import { Result } from './types';
+import { Result, ImageComparisonOptions } from './types';
 
 /**
  * @name compareImages
- * @param {string} fileName
+ * @param {ImageComparisonOptions} options
  */
-export async function imageComparisonFn(fileName: string, tolerance: number): Promise<Result> {
-    const standard = this.getImageUrl(fileName, 'standard');
-    const actual = this.getImageUrl(fileName, 'actual');
-    const threshold = tolerance === 0 ? 0 : tolerance / 100;
+export function imageComparisonFn(options: ImageComparisonOptions): Promise<Result> {
+    const threshold = options.tolerance === 0 ? 0 : options.tolerance / 100;
 
     const pixelDiff = new PixelDiff({
-        imageAPath: standard,
-        imageBPath: actual,
+        imageAPath: options.standardPath,
+        imageBPath: options.actualPath,
         thresholdType: PixelDiff.THRESHOLD_PERCENT,
         threshold,
-        imageOutputPath: this.getImageUrl(fileName, 'diff')
+        imageOutputPath: options.diffPath
     });
 
-    const comparison = await pixelDiff.runWithPromise();
-
-    return <Result>{
-        hasPassed: pixelDiff.hasPassed(comparison.code),
-        differences: comparison.differences,
-        name: fileName
-    };
+    return new Promise(resolve => {
+        pixelDiff.runWithPromise().then(comparison => {
+            resolve({
+                hasPassed: pixelDiff.hasPassed(comparison.code),
+                differences: comparison.differences,
+                name: options.fileName
+            });
+        }).catch(console.error);
+    });
 }

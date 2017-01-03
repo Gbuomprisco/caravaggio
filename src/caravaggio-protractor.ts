@@ -31,11 +31,6 @@ export function postTest(passed, testInfo) {
         return;
     }
 
-    console.log(results);
-
-    // clear results array
-    caravaggio.clear();
-
     log(`${testInfo.category}: ${testInfo.name}`);
 
     // loop over results and report to protractor
@@ -67,6 +62,7 @@ function reportToProtractor(result: Result) {
 
     // callback
     caravaggio.options.onFailure(result);
+    caravaggio.clearResult(result);
 }
 
 /**
