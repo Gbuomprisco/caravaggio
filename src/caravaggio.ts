@@ -1,6 +1,6 @@
 import { createWriteStream, existsSync, mkdirSync } from 'fs';
 import { Options, Type, Result } from './types';
-import { defaults, takeScreenshot } from './helpers';
+import { defaults, takeScreenshot, log, getFolders } from './helpers';
 import * as console from 'console';
 
 export class Caravaggio {
@@ -25,7 +25,7 @@ export class Caravaggio {
         this.options = {...defaults, ...options};
 
         // generate folders based on the option passed
-        this.createFolders();
+        this.createFolders(this.options.screenshotsPath);
     }
 
     /**
@@ -46,25 +46,27 @@ export class Caravaggio {
      *
      * @memberOf Caravaggio
      */
-    public async capture(fileName: string, selector?: string) {
-        const screenshot = await takeScreenshot(selector);
-        const standard = this.getImageUrl(fileName, 'standard');
+    public capture(fileName: string, selector?: string) {
+        takeScreenshot(selector).then(screenshot => {
+            const standard = this.getImageUrl(fileName, 'standard');
 
-        // if the standard image does not exit - create the baseline
-        if (existsSync(standard) === false) {
-            console.info(`${fileName} does not exist. It will be generated as standard image.`);
-            
-            this.createImage(fileName, screenshot, 'standard');
+            // if the standard image does not exit - create the baseline
+            if (existsSync(standard) === false) {
+                log(`${fileName} does not exist. It will be generated as standard image.`);
 
-            // callback
-            this.options.onNewImage(fileName);
-        }
+                // create the baseline image
+                this.createImage(fileName, screenshot, 'standard');
 
-        // create the image from the screenshot
-        this.createImage(fileName, screenshot, 'actual');
+                // callback
+                this.options.onNewImage(fileName);
+            }
 
-        // run comparison between images
-        this.runComparison(fileName);
+            // create the image from the screenshot
+            this.createImage(fileName, screenshot, 'actual');
+
+            // run comparison between images
+            this.runComparison(fileName);
+        });
     }
 
     /**
@@ -86,6 +88,10 @@ export class Caravaggio {
         const tolerance = this.options.tolerance;
         const result = await this.options.imageComparisonFn(fileName, tolerance);
 
+        if (this.options.debug) {
+            log(JSON.stringify(result));
+        }
+
         this.addResult(result);
     }
 
@@ -104,20 +110,26 @@ export class Caravaggio {
     }
 
     /**
+     * @name addResult
+     *
+     * @private
+     * @param {Result} result
+     *
+     * @memberOf Caravaggio
+     */
+    private addResult(result: Result): void {
+        this.results = [...this.results, result];
+    }
+
+    /**
      * @name createFolders
      *
      * @private
      *
      * @memberOf Caravaggio
      */
-    private createFolders(): void {
-        const folders = [
-            `${this.options.screenshotsPath}/standard`,
-            `${this.options.screenshotsPath}/actual`,
-            `${this.options.screenshotsPath}/diff`
-        ];
-
-        folders
+    private createFolders(screenshotsPath: string): void {
+        getFolders(screenshotsPath)
             .filter(folder => existsSync(folder) === false)
             .forEach(folder => mkdirSync(folder));
     }
@@ -132,25 +144,9 @@ export class Caravaggio {
      *
      * @memberOf Caravaggio
      */
-    private createImage(fileName: string, data: any, type: Type): void {
+    private createImage(fileName: string, data: string, type: Type): void {
         const actual = createWriteStream(this.getImageUrl(fileName, type), {flags: 'w'});
         actual.write(new Buffer(data, 'base64'));
         actual.end();
-    }
-
-    /**
-     * @name addResult
-     *
-     * @private
-     * @param {Result} result
-     *
-     * @memberOf Caravaggio
-     */
-    private addResult(result: Result): void {
-        if (this.options.debug) {
-            console.log(result);
-        }
-
-        this.results = [...this.results, result];
     }
 }

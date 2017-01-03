@@ -1,16 +1,19 @@
 {
   "name": "caravaggio-protractor",
   "description": "Caravaggio is a simple visual regression testing plugin for Protractor",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "dependencies": {
-    "pixel-diff": "^1.0.1"
+    "pixel-diff": "^1.0.1",
+    "sharp": "^0.17.0"
   },
   "devDependencies": {
     "@types/node": "^6.0.52",
     "@types/protractor": "^4.0.0",
-    "protractor": "^4.0.13",
     "tslint": "^4.1.1",
     "typescript": "^2.1.4"
+  },
+  "peerDependencies": {
+    "protractor": "^4.0.13"
   },
   "author": {
     "name": "Giancarlo Buomprisco",

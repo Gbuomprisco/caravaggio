@@ -17,7 +17,7 @@ Caravaggio is a simple visual regression testing plugin for Protractor.
 import { Caravaggio } from 'caravaggio-protractor';
 
 // or if you use node
-const Caravaggio = require('caravaggio-protractor');
+const Caravaggio = require('caravaggio-protractor').Caravaggio;
 
 exports.config = {
     // add caravaggio to the plugins array and define its options
