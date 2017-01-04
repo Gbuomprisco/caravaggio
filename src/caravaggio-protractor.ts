@@ -35,6 +35,8 @@ export function postTest(passed, testInfo) {
 
     // loop over results and report to protractor
     results.forEach(reportToProtractor.bind(this));
+
+    caravaggio.clearAll();
 }
 
 /**
@@ -62,7 +64,6 @@ function reportToProtractor(result: Result) {
 
     // callback
     caravaggio.options.onFailure(result);
-    caravaggio.clearResult(result);
 }
 
 /**

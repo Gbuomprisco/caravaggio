@@ -1,7 +1,7 @@
 {
   "name": "caravaggio-protractor",
   "description": "Caravaggio is a simple visual regression testing plugin for Protractor",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "dependencies": {
     "lwip": "0.0.9",
     "pixel-diff": "^1.0.1"
